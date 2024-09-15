@@ -1,7 +1,5 @@
 # This file is used for convenience of local development.
 # DO NOT STORE YOUR CREDENTIALS INTO GIT
-export AWS_ACCESS_KEY_ID=ASIAXMEEF7JFCM3DT5CN
-export AWS_SECRET_ACCESS_KEY=nca30ETRrbHMAJdr3UpKV/Gv/HzTag5mhsqo4IVh
 export POSTGRES_USERNAME=postgres
 export POSTGRES_PASSWORD=postgres123
 export POSTGRES_HOST=database-1.clza8ddfv9gr.us-east-1.rds.amazonaws.com

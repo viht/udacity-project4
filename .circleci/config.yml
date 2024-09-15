@@ -1,93 +1,88 @@
-# Use the latest 2.1 version of CircleCI pipeline process engine.
-# See: https://circleci.com/docs/configuration-reference
 version: 2.1
+
 orbs:
-  # orgs contain basc recipes and reproducible actions (install node, aws, etc.)
-  node: circleci/node@5.0.2
+  # orgs contain basic recipes and reproducible actions (install node, aws, eb, browser tools)
+  node: circleci/node@5.2.0
   eb: circleci/aws-elastic-beanstalk@2.0.1
-  aws-cli: circleci/aws-cli@3.1.1
-  # different jobs are calles later in the workflows sections
+  aws-cli: circleci/aws-cli@4.1.3
+  browser-tools: circleci/browser-tools@1.4.8
 jobs:
   build:
+    resource_class: large
     docker:
-      # the base image can run most needed actions with orbs
-      - image: "cimg/node:14.15"
+      - image: "cimg/node:20.11.1-browsers"
     steps:
-      # install node and checkout code
-      - node/install:
-          node-version: "14.15"
-      - checkout
-      - node/install
-      - checkout
-      - aws-cli/setup
       - eb/setup
-      # Use root level package.json to install dependencies in the frontend app
+      - browser-tools/install-chrome
+      - browser-tools/install-chromedriver
+      - checkout
       - run:
-          name: Get and install node version manager.
-          command: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
-      - run:
-          name: Install Node version 16 using NVM
-          command: nvm install 16
-      - run:
-          name: Use Node version 16 using NVM
-          command: nvm use 16
+          name: Build Tools Information
+          command: |
+            echo "NODE Version: $(node --version)"
+            echo "NPM Version: $(npm --version)"
+            echo "Chrome Version: $(google-chrome --version)"
+            echo "Chrome Driver Version: $(chromedriver --version)"
       - run:
           name: Install Front-End Dependencies
-          command: |
-            echo "NODE --version" 
-            echo $(node --version)
-            echo "NPM --version" 
-            echo $(npm --version)
-            npm run frontend:install
-      # TODO: Install dependencies in the the backend API
+          command: npm run frontend:install
       - run:
           name: Install API Dependencies
-          command: |
-            echo "TODO: Install dependencies in the the backend API  "
-
-            npm run backend:install
-      # TODO: Lint the frontend
+          command: npm run api:install
       - run:
           name: Front-End Lint
-          command: |
-            echo "TODO: Lint the frontend"
-            npm run frontend:lint
-      # TODO: Build the frontend app
+          command: npm run frontend:lint
+      - run:
+          name: Front-End Test
+          command: npm run frontend:test
       - run:
           name: Front-End Build
-          command: |
-            echo "TODO: Build the frontend app"
-            nvm use 16
-            npm run frontend:build
-      # TODO: Build the backend API
+          command: npm run frontend:build
       - run:
           name: API Build
-          command: |
-            echo "TODO: Build the backend API"
-            npm run backend:build
+          command: npm run api:build
+      - save_cache:
+          name: Save Build Cache
+          key: build-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - "udagram/udagram-api/www"
+            - "udagram/udagram-frontend/www"
+
   # deploy step will run only after manual approval
   deploy:
+    resource_class: large
     docker:
-      - image: "cimg/base:stable"
-      # more setup needed for aws, node, elastic beanstalk
+      - image: "cimg/node:20.11.1"
     steps:
-      - node/install:
-          node-version: "14.15"
       - eb/setup
       - aws-cli/setup
       - checkout
+      - restore_cache:
+          name: Restore Build Cache
+          keys:
+            - build-{{ .Branch }}-{{ .Revision }}
       - run:
-          name: Deploy App
-          # TODO: Install, build, deploy in both apps
+          name: Config API Environment Variables
+          command: npm run api:env
+      - run:
+          name: Deploy WEB and API
           command: |
-            echo "# TODO: Install, build, deploy in both apps"
-            npm run frontend:deploy
-            npm run backend:deploy
+            ls -la udagram/udagram-api
+            ls -la udagram/udagram-frontend
+            npm run deploy
 
 workflows:
   udagram:
     jobs:
       - build
-      - deploy:
+      - hold:
+          filters:
+            branches:
+              only:
+                - master
+          type: approval
           requires:
             - build
+      - deploy:
+          requires:
+            - hold

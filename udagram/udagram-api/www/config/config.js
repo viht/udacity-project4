@@ -26,7 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.config = void 0;
 const dotenv = __importStar(require("dotenv"));
 dotenv.config();
-// ENV variables 
+// ENV variables
 // - AWS_ACCESS_KEY_ID
 // - AWS_SECRET_ACCESS_KEY
 // Are Also needed
@@ -35,6 +35,8 @@ exports.config = {
     password: process.env.POSTGRES_PASSWORD,
     database: process.env.POSTGRES_DB,
     host: process.env.POSTGRES_HOST,
+    aws_access_key_id: process.env.AWS_ACCESS_KEY_ID,
+    aws_secret_access_key: process.env.AWS_SECRET_ACCESS_KEY,
     aws_region: process.env.AWS_REGION,
     aws_profile: process.env.AWS_PROFILE,
     aws_media_bucket: process.env.AWS_BUCKET,
