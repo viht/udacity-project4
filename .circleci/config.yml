@@ -23,6 +23,7 @@ jobs:
             echo "NPM Version: $(npm --version)"
             echo "Chrome Version: $(google-chrome --version)"
             echo "Chrome Driver Version: $(chromedriver --version)"
+            eb list
       - run:
           name: Install Front-End Dependencies
           command: npm run frontend:install
