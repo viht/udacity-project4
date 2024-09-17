@@ -6,8 +6,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "NODE_OPTIONS=--openssl-legacy-provider ng build",
-    "deploy": "npm install -f && npm run build && chmod +x bin/deploy.sh && bin/deploy.sh",
+    "build": "ng build",
+    "deploy": "npm install -f && npm run build --openssl-legacy-provider && chmod +x bin/deploy.sh && bin/deploy.sh",
     "test": "NODE_OPTIONS=--openssl-legacy-provider ng test --watch=false",
     "lint": "ng lint",
     "e2e": "ng e2e"
