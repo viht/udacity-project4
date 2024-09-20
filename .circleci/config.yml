@@ -62,9 +62,6 @@ jobs:
           keys:
             - build-{{ .Branch }}-{{ .Revision }}
       - run:
-          name: Config API Environment Variables
-          command: npm run api:env
-      - run:
           name: Deploy WEB and API
           command: |
             ls -la udagram/udagram-api
