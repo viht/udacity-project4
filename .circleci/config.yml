@@ -41,6 +41,10 @@ jobs:
       - run:
           name: API Build
           command: npm run api:build
+      - run:
+          name: Generate deployment package
+          command: |
+           zip -r deploy.zip * -x ./node_modules
       - save_cache:
           name: Save Build Cache
           key: build-{{ .Branch }}-{{ .Revision }}
