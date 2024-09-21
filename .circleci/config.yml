@@ -10,7 +10,7 @@ jobs:
   build:
     resource_class: large
     docker:
-      - image: "cimg/node:20.11.1-browsers"
+      - image: "cimg/node:16.20.2-browsers"
     steps:
       - eb/setup
       - browser-tools/install-chrome
@@ -56,7 +56,7 @@ jobs:
   deploy:
     resource_class: large
     docker:
-      - image: "cimg/node:20.11.1"
+      - image: "cimg/node:16.20.2"
     steps:
       - eb/setup
       - aws-cli/setup
